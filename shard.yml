@@ -1,0 +1,13 @@
+name: ingraham
+version: 0.1.0
+
+authors:
+  - Aroop Roelofs <me@finlaydag33k.nl>
+
+targets:
+  ingraham:
+    main: src/ingraham.cr
+
+crystal: '>= 1.21.0'
+
+license: MIT
