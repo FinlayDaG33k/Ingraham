@@ -17,7 +17,7 @@ jobs:
           mv bin/ingraham bin/ingraham-linux-amd64
       - uses: actions/upload-artifact@v7
         with:
-          name: linux-amd64
+          name: ingraham-linux-amd64
           path: bin/ingraham-linux-amd64
           if-no-files-found: error
   build-windows-amd64:
@@ -35,6 +35,6 @@ jobs:
           Rename-Item -Path bin/ingraham.exe -NewName ingraham-windows-amd64.exe
       - uses: actions/upload-artifact@v7
         with:
-          name: windows-amd64
+          name: ingraham-windows-amd64
           path: bin/ingraham-windows-amd64.exe
           if-no-files-found: error
