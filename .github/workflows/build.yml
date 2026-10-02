@@ -1,0 +1,39 @@
+name: Build
+
+on: push
+
+jobs:
+  build_release:
+    name: Build Release ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [linux-amd64, windows]
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install Crystal
+        uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: 1.21
+      - name: Run Linux AMD64 Build
+        if: matrix.os == 'linux-amd64'
+        run: |
+          mkdir -p bin
+          chmod 755 bin
+          docker run -d --name alpine -v $(pwd):/workspace -w /workspace crystallang/crystal:1.21-alpine tail -f /dev/null
+          docker exec alpine shards install --without-development --release --static
+          docker exec alpine shards build --release --static
+          docker exec alpine mv bin/ingraham bin/ingraham-amd64-linux
+      - name: Run Windows AMD64 Build
+        if: matrix.os == 'windows'
+        run: |
+          shards build --release --static
+          Set-ExecutionPolicy RemoteSigned -Scope Process
+          Rename-Item -Path bin/ingraham.exe -NewName ingraham-amd64-win.exe
+      - uses: actions/upload-artifact@v7
+        with:
+          files: |
+            bin/ingraham-amd64-linux
+            bin/ingraham-amd64-win.exe
+          archive: false
