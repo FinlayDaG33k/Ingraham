@@ -3,7 +3,12 @@
 Troubleshooting tool that tests common failure points for your internet connection.  
 When provided with temporary API access to a MikroTik router, also will check some common issues there!
 
-**NOTE**: Currently support IPv4 only, I do not have IPv6 networking at the moment to test with.
+**NOTE**: 
+> Currently support IPv4 only, I do not have IPv6 networking at the moment to develop and test with.
+
+**NOTE**:
+> Currently only officially supports Windows 10 but should work with Windows 11 just fine.  
+> Linux binaries are also compiled but I have no way to really test them at the moment.
 
 ## What it do?
 
@@ -29,6 +34,14 @@ It simply automates the things I normally check when my internet connection appe
      add name=troubleshooter 
    ```
 2. Run the troubleshooter
+   ```
+   # Windows (Powershell)
+   ./ingraham-amd64-win.exe
+
+   # Linux (Shell)
+   chmod +x ingraham-amd64-linux
+   ./ingraham-amd64-linux
+   ```
 3. Enter credentials for user created in step 1 when prompted.
    Skipping this step will skip checking your Router's config.
 
@@ -68,3 +81,23 @@ http:
 In case I did not compile for your platform or you aren't that keen on running a mystery blob, you can opt to compile this tool yourself.  
 
 TODO: Write proper instructions
+
+1. [Install Crystal](https://crystal-lang.org/install/) for your platform.
+2. Clone the repo and cd into it:
+   ```
+   git clone https://github.com/FinlayDaG33k/Ingraham.git ingraham
+   cd ingraham
+   ```
+3. Install dependencies:
+   ```
+   shards install
+   ```
+4. Build:
+   ```
+   # Without debug symbols (recommended for end-users)
+   shards build --release --static --no-debug
+
+   # With debug symbols (recommended for development)
+   shards build --release --static
+   ```
+5. Your binaries will now be in the directory `bin`!
