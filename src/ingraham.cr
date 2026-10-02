@@ -1,0 +1,138 @@
+require "colorize"
+require "./test-response-codes"
+require "./testers/dns"
+require "./testers/http"
+require "./testers/system"
+require "./testers/ping"
+require "./testers/mikrotik"
+require "./config"
+
+module Ingraham
+  # Get version from shard.yml
+  VERSION = {{ read_file("#{__DIR__}/../shard.yml").split("\n").find { |l| l.starts_with?("version:") }.split(":")[1].strip }}
+
+  # Status parser
+  def self.status_parser(status_code)
+    case status_code
+    when TestResponseCodes::OK.value
+      puts " OK!".colorize(:green)
+    when TestResponseCodes::FAIL.value
+      puts " FAIL!".colorize(:red)
+    when TestResponseCodes::UNKNOWN.value
+      puts " UNKNOWN!".colorize(:yellow)
+    end
+  end
+
+  # Load config
+  config = load_config()
+
+  # Every good CLI tool has some form of banner, right?
+  puts "=== Ingraham ==="
+  puts "Version: #{VERSION}"
+  puts "Made with <3 by FinlayDaG33k"
+  
+  # Start system tests
+  puts "=== System Test ==="
+  system_tester = SystemTester.new
+
+  # Make sure we have a route
+  print "Testing for IP..."
+  status = system_tester.get_primary_ip()
+  status_parser(status)
+  
+  # Test Ping
+  puts "=== Ping Test ==="
+  config.icmp.servers.each do |server|
+    print "Testing Ping server \"#{server}\"..."
+    ping_tester = PingTester.new server
+    status = ping_tester.test()
+    status_parser(status)
+  end
+
+  # Test DNS
+  puts "=== DNS Test ==="
+  config.dns.servers.each do |server|
+    print "Testing DNS server \"#{server}\"..."
+    dns_tester = DnsTester.new server
+    status = dns_tester.test()
+    status_parser(status)
+  end
+
+  # Test HTTP
+  puts "=== HTTP Test ==="
+  config.http.servers.each do |server|
+    print "Testing HTTP server \"#{server}\"..."
+    http_tester = HttpTester.new server
+    status = http_tester.test()
+    status_parser(status)
+  end
+
+  # Test Mikrotik
+  # TODO: Clean this up
+  puts "=== Router Test ==="
+
+  # Ask whether to proceed
+  puts "Do you want to test your router too?"
+  print "y/N > "
+  confirmation = gets
+  if confirmation != "y" && confirmation != "Y"
+    puts "Goodbye!"
+    exit
+  end
+
+  # Ask for hostname
+  mikrotik_host = nil
+  while mikrotik_host.nil?
+    print "IP for router: "
+    mikrotik_host = gets
+  end
+
+  # Ask for username
+  mikrotik_username = nil
+  while mikrotik_username.nil?
+    print "Username for router: "
+    mikrotik_username = STDIN.noecho do
+      STDIN.gets.try &.chomp
+    end
+  end
+  
+  mikrotik_password = nil
+  while mikrotik_password.nil?
+    print "Password for router: "
+    mikrotik_password = STDIN.noecho do
+      STDIN.gets.try &.chomp
+    end
+  end
+ 
+  print "Test interface name [ether1]: "
+  mikrotik_interface = gets
+  if mikrotik_interface.nil?
+    mikrotik_interface = "ether1"
+  end
+
+  # Initialize tester
+  mikrotik_tester = MikrotikTester.new mikrotik_host, mikrotik_username, mikrotik_password
+
+  # Test interface status
+  print "Testing WAN interface status..."
+  status = mikrotik_tester.interface_status(mikrotik_interface)
+  status_parser(status)
+
+  # Test whether interface has address
+  print "Testing WAN interface address..."
+  status = mikrotik_tester.interface_address(mikrotik_interface)
+  status_parser(status)
+
+  # Test whether default route exists
+  print "Testing Router default route..."
+  status = mikrotik_tester.default_route()
+  status_parser(status)
+
+  # Test whether interface can ping
+  config.icmp.servers.each do |server|
+    print "Testing Ping server \"#{server}\"..."
+    status = mikrotik_tester.ping(server)
+    status_parser(status)
+  end
+end
+

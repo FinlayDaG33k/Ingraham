@@ -1,0 +1,81 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  build-linux-amd64:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:1.21-alpine
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set shards version from current commit
+        run: |
+          # Prepare
+          git config --global --add safe.directory /__w/Ingraham/Ingraham
+
+          # Get the 7-character short commit SHA
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          
+          # Read the base version from shard.yml
+          BASE_VERSION=$(grep -E '^version:' shard.yml | awk '{print $2}')
+          
+          # Update shard.yml
+          sed -i "s/^version:.*/version: ${SHORT_SHA}/" shard.yml
+      - name: Build and package
+        run: |
+          mkdir -p bin
+          shards install
+          shards build --release --static --no-debug
+          mv bin/ingraham bin/ingraham-linux-amd64
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ingraham-linux-amd64
+          path: bin/ingraham-linux-amd64
+          if-no-files-found: error
+  build-windows-amd64:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+      - uses: crystal-lang/install-crystal@v1
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Set shards version from current commit
+        run: |
+          # Prepare
+          git config --global --add safe.directory /__w/Ingraham/Ingraham
+
+          # Get the 7-character short commit SHA
+          $shortSha = (git rev-parse --short HEAD).Trim()
+          
+          # Read the shard.yml file content
+          $shardFile = Get-Content shard.yml -Raw
+          
+          # Extract the current base version (e.g., 0.1.0) using regex
+          if ($shardFile -match '(?m)^version:\s*(.+)$') {             
+              # Replace the old version line with the new one
+              $updatedContent = $shardFile -replace '(?m)^version:\s*.*$', "version: $shortSha"
+              
+              # Save the changes back to shard.yml
+              Set-Content -Path shard.yml -Value $updatedContent -Encoding utf8
+              
+              Write-Host "Updated shard.yml version to: $newVersion"
+          } else {
+              Write-Error "Could not find a 'version:' field in shard.yml"
+              exit 1
+          }
+      - name: Build and package
+        run: |
+          shards install
+          shards build --release --static --no-debug
+          Rename-Item -Path bin/ingraham.exe -NewName ingraham-windows-amd64.exe
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ingraham-windows-amd64
+          path: bin/ingraham-windows-amd64.exe
+          if-no-files-found: error
