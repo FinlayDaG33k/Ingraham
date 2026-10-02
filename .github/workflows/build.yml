@@ -7,7 +7,7 @@ jobs:
     name: Build Release ${{ matrix.os }}
     strategy:
       matrix:
-        os: [linux-amd64, windows]
+        os: [ubuntu-latest, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
       - name: Checkout code
@@ -17,7 +17,7 @@ jobs:
         with:
           crystal: 1.21
       - name: Run Linux AMD64 Build
-        if: matrix.os == 'linux-amd64'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           mkdir -p bin
           chmod 755 bin
