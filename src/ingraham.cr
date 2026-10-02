@@ -8,7 +8,8 @@ require "./testers/mikrotik"
 require "./config"
 
 module Ingraham
-  VERSION = "0.1.0"
+  # Get version from shard.yml
+  VERSION = {{ read_file("#{__DIR__}/../shard.yml").split("\n").find { |l| l.starts_with?("version:") }.split(":")[1].strip }}
 
   # Status parser
   def self.status_parser(status_code)
