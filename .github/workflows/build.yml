@@ -9,6 +9,19 @@ jobs:
       image: crystallang/crystal:1.21-alpine
     steps:
       - uses: actions/checkout@v6
+      - name: Set shards version from current commit
+        run: |
+          # Get the 7-character short commit SHA
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          
+          # Read the base version from shard.yml
+          BASE_VERSION=$(grep -E '^version:' shard.yml | awk '{print $2}')
+          
+          # Construct the new version string
+          NEW_VERSION="${BASE_VERSION}+git.commit.${SHORT_SHA}"
+          
+          # Update shard.yml
+          sed -i "s/^version:.*/version: ${NEW_VERSION}/" shard.yml
       - name: Build and package
         run: |
           mkdir -p bin
@@ -28,6 +41,19 @@ jobs:
           ref: ${{ env.RELEASE_TAG }}
       - uses: crystal-lang/install-crystal@v1
       - uses: ilammy/msvc-dev-cmd@v1
+      - name: Set shards version from current commit
+        run: |
+          # Get the 7-character short commit SHA
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          
+          # Read the base version from shard.yml
+          BASE_VERSION=$(grep -E '^version:' shard.yml | awk '{print $2}')
+          
+          # Construct the new version string
+          NEW_VERSION="${BASE_VERSION}+git.commit.${SHORT_SHA}"
+          
+          # Update shard.yml
+          sed -i "s/^version:.*/version: ${NEW_VERSION}/" shard.yml
       - name: Build and package
         run: |
           shards install
