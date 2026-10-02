@@ -20,11 +20,8 @@ jobs:
           # Read the base version from shard.yml
           BASE_VERSION=$(grep -E '^version:' shard.yml | awk '{print $2}')
           
-          # Construct the new version string
-          NEW_VERSION="${BASE_VERSION}+git.commit.${SHORT_SHA}"
-          
           # Update shard.yml
-          sed -i "s/^version:.*/version: ${NEW_VERSION}/" shard.yml
+          sed -i "s/^version:.*/version: ${SHORT_SHA}/" shard.yml
       - name: Build and package
         run: |
           mkdir -p bin
