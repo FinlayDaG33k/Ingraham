@@ -14,7 +14,7 @@ jobs:
           mkdir -p bin
           shards install
           shards build --release --static --no-debug
-          mv bin/ingraham bin/instagam-linux-amd64
+          mv bin/ingraham bin/ingraham-linux-amd64
       - uses: actions/upload-artifact@v7
         with:
           name: linux-amd64
