@@ -3,28 +3,24 @@ name: Build
 on: push
 
 jobs:
-  build_release:
+  build:
     name: Build Release ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu, windows]
+        crystal: [1.21]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       - name: Install Crystal
         uses: crystal-lang/install-crystal@v1
         with:
-          crystal: 1.21
-      - name: Run Linux AMD64 Build
-        if: matrix.os == 'ubuntu'
-        run: |
-          mkdir -p bin
-          chmod 755 bin
-          docker run -d --name alpine -v $(pwd):/workspace -w /workspace crystallang/crystal:1.21-alpine tail -f /dev/null
-          docker exec alpine shards install --without-development --release --static
-          docker exec alpine shards build --release --static
-          docker exec alpine mv bin/ingraham bin/ingraham-amd64-linux
+          crystal: ${{ matrix.crystal }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: shards install
+      - name: Build Linux AMD64
+        run: shards build --release --static
       - name: Run Windows AMD64 Build
         if: matrix.os == 'windows'
         run: |
