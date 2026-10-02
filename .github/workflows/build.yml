@@ -50,16 +50,24 @@ jobs:
           git config --global --add safe.directory /__w/Ingraham/Ingraham
 
           # Get the 7-character short commit SHA
-          SHORT_SHA=$(git rev-parse --short HEAD)
+          $shortSha = (git rev-parse --short HEAD).Trim()
           
-          # Read the base version from shard.yml
-          BASE_VERSION=$(grep -E '^version:' shard.yml | awk '{print $2}')
+          # Read the shard.yml file content
+          $shardFile = Get-Content shard.yml -Raw
           
-          # Construct the new version string
-          NEW_VERSION="${BASE_VERSION}+git.commit.${SHORT_SHA}"
-          
-          # Update shard.yml
-          sed -i "s/^version:.*/version: ${NEW_VERSION}/" shard.yml
+          # Extract the current base version (e.g., 0.1.0) using regex
+          if ($shardFile -match '(?m)^version:\s*(.+)$') {             
+              # Replace the old version line with the new one
+              $updatedContent = $shardFile -replace '(?m)^version:\s*.*$', "version: $shortSha"
+              
+              # Save the changes back to shard.yml
+              Set-Content -Path shard.yml -Value $updatedContent -Encoding utf8
+              
+              Write-Host "Updated shard.yml version to: $newVersion"
+          } else {
+              Write-Error "Could not find a 'version:' field in shard.yml"
+              exit 1
+          }
       - name: Build and package
         run: |
           shards install
