@@ -94,9 +94,9 @@ module Ingraham
         # Read Name Pointer (usually 0xc000 because of compression) using the correct Type tokens
         name_pointer = response_reader.read_bytes(UInt16, IO::ByteFormat::BigEndian)
         
-        type     = response_reader.read_bytes(UInt16, IO::ByteFormat::BigEndian)
-        cls      = response_reader.read_bytes(UInt16, IO::ByteFormat::BigEndian)
-        ttl      = response_reader.read_bytes(UInt32, IO::ByteFormat::BigEndian)
+        type = response_reader.read_bytes(UInt16, IO::ByteFormat::BigEndian)
+        cls = response_reader.read_bytes(UInt16, IO::ByteFormat::BigEndian)
+        ttl = response_reader.read_bytes(UInt32, IO::ByteFormat::BigEndian)
         rdlength = response_reader.read_bytes(UInt16, IO::ByteFormat::BigEndian)
 
         if type == 1 && rdlength == 4 # Type 1 is Type A (IPv4)
