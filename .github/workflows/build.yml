@@ -3,34 +3,21 @@ name: Build
 on: push
 
 jobs:
-  build:
-    name: Build Release ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu, windows]
-        crystal: [1.21]
-    runs-on: ${{ matrix.os }}-latest
+  build-windows-amd64:
+    runs-on: windows-latest
     steps:
-      - name: Install Crystal
-        uses: crystal-lang/install-crystal@v1
+      - uses: actions/checkout@v6
         with:
-          crystal: ${{ matrix.crystal }}
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Install dependencies
-        run: shards install
-      - name: Build Linux AMD64
-        if: matrix.os == 'ubuntu'
-        run: shards build --release --static
-      - name: Run Windows AMD64 Build
-        if: matrix.os == 'windows'
+          ref: ${{ env.RELEASE_TAG }}
+      - uses: crystal-lang/install-crystal@v1
+      - uses: ilammy/msvc-dev-cmd@v1
+      - name: Build and package
         run: |
-          shards build --release --static
-          Set-ExecutionPolicy RemoteSigned -Scope Process
-          Rename-Item -Path bin/ingraham.exe -NewName ingraham-amd64-win.exe
+          shards build --release --static --no-debug
+          (Get-FileHash ./bin/ingraham.exe).Hash | Out-File ./bin/checksums.txt
+          Compress-Archive -Path ./bin/* -DestinationPath ingraham-windows-amd64.zip
       - uses: actions/upload-artifact@v7
         with:
-          path: |
-            bin/ingraham-amd64-linux
-            bin/ingraham-amd64-win.exe
-          archive: false
+          name: windows
+          path: ingraham-windows-amd64.zip
+          if-no-files-found: error
