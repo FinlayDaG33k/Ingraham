@@ -5,15 +5,16 @@ on: push
 jobs:
   build-linux-amd64:
     runs-on: ubuntu-latest
-    env:
-      FORCE_COLOR: 1
+    container:
+      image: crystallang/crystal:1.21-alpine
     steps:
       - uses: actions/checkout@v6
-      - uses: crystal-lang/install-crystal@v1
       - name: Build and package
         run: |
           mkdir -p bin
+          shards install
           shards build --release --static --no-debug
+          mb bin/ingraham bin/instagam-linux-amd64
       - uses: actions/upload-artifact@v7
         with:
           name: linux-amd64
@@ -29,6 +30,7 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - name: Build and package
         run: |
+          shards install
           shards build --release --static --no-debug
           Rename-Item -Path bin/ingraham.exe -NewName ingraham-windows-amd64.exe
       - uses: actions/upload-artifact@v7
