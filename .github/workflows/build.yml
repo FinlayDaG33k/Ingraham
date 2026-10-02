@@ -33,7 +33,7 @@ jobs:
           Rename-Item -Path bin/ingraham.exe -NewName ingraham-amd64-win.exe
       - uses: actions/upload-artifact@v7
         with:
-          files: |
+          path: |
             bin/ingraham-amd64-linux
             bin/ingraham-amd64-win.exe
           archive: false
