@@ -80,6 +80,11 @@ module Ingraham
     exit
   end
 
+  # Tell the user what happens to their credentials
+  puts "You will be prompted for your router credentials."
+  puts "These will only be kept in-memory while the tool runs, not written to disk."
+  puts "They will definitely NEVER be sent to a server by this tool."
+
   # Ask for hostname
   mikrotik_host = nil
   while mikrotik_host.nil?
