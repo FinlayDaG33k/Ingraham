@@ -1,5 +1,7 @@
 # Ingraham
 
+[![Build](https://github.com/FinlayDaG33k/Ingraham/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/FinlayDaG33k/Ingraham/actions?query=branch%3Amain)
+
 Troubleshooting tool that tests common failure points for your internet connection.  
 When provided with temporary API access to a MikroTik router, also will check some common issues there!
 
