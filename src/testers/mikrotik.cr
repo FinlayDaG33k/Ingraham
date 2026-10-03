@@ -7,6 +7,35 @@ module Ingraham
     def initialize(@host : String, @username : String, @password : String, @port : Int32 = 80, @ssl : Bool = false)
     end
 
+    def test_credentials()
+      # Create HTTP Client
+      client = self.create_client()
+
+      # Send request
+      begin
+        response = client.post("/rest/system/identity/print")
+
+        # Check if we got a 401 response
+        # Fail if we do
+        if response.status == HTTP::Status::UNAUTHORIZED
+          return TestResponseCodes::FAIL.value
+        end
+
+        # Check if we got a 200 response
+        # Error if not
+        if response.status != HTTP::Status::OK
+          return TestResponseCodes::UNKNOWN.value
+        end
+
+        # All good
+        return TestResponseCodes::OK.value
+      rescue IO::TimeoutError
+        return TestResponseCodes::UNKNOWN.value
+      rescue
+        return TestResponseCodes::UNKNOWN.value
+      end
+    end
+
     def interface_status(interface : String)
       # Create HTTP Client
       client = self.create_client()

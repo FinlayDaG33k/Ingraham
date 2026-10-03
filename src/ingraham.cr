@@ -105,38 +105,66 @@ module Ingraham
   puts "These will only be kept in-memory while the tool runs, not written to disk."
   puts "They will definitely NEVER be sent to a server by this tool."
 
-  # Ask for hostname
+  # Ask for credentials
   mikrotik_host = nil
-  while mikrotik_host.nil?
-    print "IP for router: "
-    mikrotik_host = gets
-  end
-
-  # Ask for username
   mikrotik_username = nil
-  while mikrotik_username.nil?
-    print "Username for router: "
-    mikrotik_username = STDIN.noecho do
-      STDIN.gets.try &.chomp
-    end
-  end
-  
   mikrotik_password = nil
-  while mikrotik_password.nil?
-    print "Password for router: "
-    mikrotik_password = STDIN.noecho do
-      STDIN.gets.try &.chomp
+  mikrotik_interface = "ether1"
+  while true
+    # Ask for hostname
+    while mikrotik_host.nil?
+      print "IP for router: "
+      mikrotik_host = gets
     end
-  end
- 
-  print "Test interface name [ether1]: "
-  mikrotik_interface = gets
-  if mikrotik_interface.nil?
-    mikrotik_interface = "ether1"
+
+    # Ask for username
+    
+    while mikrotik_username.nil?
+      print "Username for router: "
+      mikrotik_username = STDIN.noecho do
+        STDIN.gets.try &.chomp
+      end
+    end
+    
+    # Ask for password
+    while mikrotik_password.nil?
+      print "Password for router: "
+      mikrotik_password = STDIN.noecho do
+        STDIN.gets.try &.chomp
+      end
+    end
+  
+    # Ask for WAN interface
+    print "Test interface name [#{mikrotik_interface}]: "
+    mikrotik_interface_temp = gets
+    if !(mikrotik_interface_temp.nil? || mikrotik_interface_temp == "")
+      mikrotik_interface = mikrotik_interface_temp
+    end
+
+    # Initialize tester
+    mikrotik_tester = MikrotikTester.new mikrotik_host, mikrotik_username, mikrotik_password
+
+    # Check whether we have valid credentials
+    print "Testing credentials..."
+    status = mikrotik_tester.test_credentials()
+    status_parser(status)
+
+    # Break if we have valid credentials
+    if status == TestResponseCodes::OK.value
+      break
+    end
+
+    # Reset credentials
+    mikrotik_host = nil
+    mikrotik_username = nil
+    mikrotik_password = nil
   end
 
-  # Initialize tester
-  mikrotik_tester = MikrotikTester.new mikrotik_host, mikrotik_username, mikrotik_password
+  # Make compiler happy
+  if mikrotik_tester.nil?
+    puts "Congratulations, you've found a bug"
+    exit
+  end
 
   # Test interface status
   print "Testing WAN interface status..."
