@@ -2,6 +2,7 @@ require "colorize"
 require "./test-response-codes"
 require "./testers/dns"
 require "./testers/http"
+require "./testers/https"
 require "./testers/system"
 require "./testers/ping"
 require "./testers/mikrotik"
@@ -74,6 +75,15 @@ module Ingraham
     print "Testing HTTP server \"#{server}\"..."
     http_tester = HttpTester.new server
     status = http_tester.test()
+    status_parser(status)
+  end
+
+  # Test HTTPS
+  puts "=== HTTPS Test ==="
+  config.http.servers.each do |server|
+    print "Testing HTTPS server \"#{server}\"..."
+    https_tester = HttpsTester.new server
+    status = https_tester.test()
     status_parser(status)
   end
 

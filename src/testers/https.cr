@@ -2,13 +2,13 @@ require "http/client"
 require "../test-response-codes"
 
 module Ingraham
-  struct HttpTester
+  struct HttpsTester
     def initialize(@server : String)
     end
 
     def test()
-      # Create HTTP Client
-      client = HTTP::Client.new(@server, tls: false)
+      # Create HTTPS Client
+      client = HTTP::Client.new(@server, tls: true)
       client.connect_timeout = 5.seconds
 
       # Send request
@@ -17,7 +17,9 @@ module Ingraham
         return TestResponseCodes::OK.value
       rescue IO::TimeoutError
         return TestResponseCodes::FAIL.value
-      rescue
+      rescue ex : OpenSSL::SSL::Error
+        return TestResponseCodes::FAIL.value
+      rescue ex 
         return TestResponseCodes::UNKNOWN.value
       end
     end

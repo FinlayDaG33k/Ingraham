@@ -55,6 +55,7 @@ By default, the following targets are used for testing:
 - DNS: [86.54.11.1](https://joindns4.eu/), [185.222.222.222](https://dns.sb/) and [9.9.9.9](https://quad9.net/) (resolving [mikrotik.com](https://mikrotik.com/)).
 - NTP: [ntp.vsl.nl](https://www.vsl.nl/), [ntp.se](https://www.netnod.se/swedish-distributed-time-service) and [times.tu-berlin.de](https://www.tu.berlin/campusmanagement/angebot/zeitserver).
 - HTTP: [european-union.europa.eu](https://european-union.europa.eu), [www.qwant.com](https://www.qwant.com/) and [bunny.net](https://bunny.net/).
+- HTTPS: Same as HTTP.
 
 These targets have been chosen due to them generally being very stable *and* being *Europe*-based providers.  
 I am *NOT* affiliated with any of them, nor did I really ask for their approval.
