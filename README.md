@@ -18,7 +18,8 @@ It simply automates the things I normally check when my internet connection appe
 
 - Whether my device has an IP (DHCP failure).
 - Whether I can ping some known hosts on the WAN (overall internet check).
-- Whether I can make DNS lookup (DNS server failure)
+- Whether I can make DNS lookup (DNS server failure).
+- Whether I have the right time.
 - Whether I can make HTTP requests *AND* HTTPS requests (TLS failure).
   - HTTPS requests to be added in the future.
 - Whether the WAN interface is up (physical connection failure/port disabled).
@@ -52,6 +53,7 @@ By default, the following targets are used for testing:
 
 - Ping: [86.54.11.1](https://joindns4.eu/), [185.222.222.222](https://dns.sb/) and [9.9.9.9](https://quad9.net/).
 - DNS: [86.54.11.1](https://joindns4.eu/), [185.222.222.222](https://dns.sb/) and [9.9.9.9](https://quad9.net/) (resolving [mikrotik.com](https://mikrotik.com/)).
+- NTP: [ntp.vsl.nl](https://www.vsl.nl/), [ntp.se](https://www.netnod.se/swedish-distributed-time-service) and [times.tu-berlin.de](https://www.tu.berlin/campusmanagement/angebot/zeitserver).
 - HTTP: [european-union.europa.eu](https://european-union.europa.eu), [www.qwant.com](https://www.qwant.com/) and [bunny.net](https://bunny.net/).
 
 These targets have been chosen due to them generally being very stable *and* being *Europe*-based providers.  
@@ -72,6 +74,12 @@ icmp:
   servers:
     - 127.0.0.1
     - 192.168.1.2
+ntp:
+  servers:
+    - time.google.com
+    - time.cloudflare.com
+  # Maximum deviation (in seconds you allow)
+  max_deviation: 300
 http:
   servers:
     - www.finlaydag33k.nl

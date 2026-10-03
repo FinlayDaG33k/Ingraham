@@ -20,6 +20,16 @@ module Ingraham
     end
   end
 
+  class NtpSettings
+    include YAML::Serializable
+
+    property servers : Array(String) = ["ntp.vsl.nl", "ntp.se", "times.tu-berlin.de"]
+    property max_deviation : Int32 = 180
+
+    def initialize
+    end
+  end
+
   class HttpSettings
     include YAML::Serializable
 
@@ -34,6 +44,7 @@ module Ingraham
 
     property dns : DnsSettings = DnsSettings.new
     property icmp : IcmpSettings = IcmpSettings.new
+    property ntp : NtpSettings = NtpSettings.new
     property http : HttpSettings = HttpSettings.new
 
     def initialize

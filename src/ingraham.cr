@@ -5,6 +5,7 @@ require "./testers/http"
 require "./testers/system"
 require "./testers/ping"
 require "./testers/mikrotik"
+require "./testers/ntp"
 require "./config"
 
 module Ingraham
@@ -55,6 +56,15 @@ module Ingraham
     print "Testing DNS server \"#{server}\"..."
     dns_tester = DnsTester.new server
     status = dns_tester.test()
+    status_parser(status)
+  end
+
+  # Test NTP
+  puts "=== NTP Test ==="
+  config.ntp.servers.each do |server|
+    print "Testing NTP server \"#{server}\"..."
+    ntp_tester = NtpTester.new server,config.ntp.max_deviation
+    status = ntp_tester.test()
     status_parser(status)
   end
 
