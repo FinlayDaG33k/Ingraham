@@ -21,7 +21,6 @@ It simply automates the things I normally check when my internet connection appe
 - Whether I can make DNS lookup (DNS server failure).
 - Whether I have the right time.
 - Whether I can make HTTP requests *AND* HTTPS requests (TLS failure).
-  - HTTPS requests to be added in the future.
 - Whether the WAN interface is up (physical connection failure/port disabled).
 - Whether the WAN interface has an IP (connection to ISP).
 - Whether the routing table has a default gateway (DHCP client misconfiguration).
